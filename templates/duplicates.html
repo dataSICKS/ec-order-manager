@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% set active = "duplicates" %}
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-files me-2"></i>重複注文（{{ orders|length }}件）</h4>
+
+{% if orders %}
+<div class="table-responsive">
+  <table class="table table-hover bg-white shadow-sm rounded">
+    <thead class="table-light">
+      <tr>
+        <th>注文番号</th>
+        <th>顧客名</th>
+        <th>メール</th>
+        <th>商品</th>
+        <th>金額</th>
+        <th>注文日</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      <tr class="table-warning">
+        <td>#{{ order.code or order.id }}</td>
+        <td>{{ order.customer_last_name or '' }} {{ order.customer_first_name or '' }}</td>
+        <td>{{ order.email or '' }}</td>
+        <td>{{ order.line_items[0].name if order.line_items else '-' }}</td>
+        <td>¥{{ "{:,}".format(order.total_price|int) if order.total_price else '-' }}</td>
+        <td>{{ order.created_at or '' }}</td>
+        <td>
+          <form action="/orders/duplicates/{{ order.id }}/cancel" method="post" class="d-inline"
+                onsubmit="return confirm('注文 #{{ order.code or order.id }} の決済をキャンセルしますか？')">
+            <button class="btn btn-sm btn-danger">
+              <i class="bi bi-x-circle me-1"></i>キャンセル
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>重複注文はありません。</div>
+{% endif %}
+{% endblock %}
