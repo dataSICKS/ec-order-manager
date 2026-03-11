@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% set active = "test_orders" %}
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-bug me-2"></i>テスト受注（{{ orders|length }}件）</h4>
+
+{% if orders %}
+<div class="table-responsive">
+  <table class="table table-hover bg-white shadow-sm rounded">
+    <thead class="table-light">
+      <tr>
+        <th>注文番号</th>
+        <th>顧客名</th>
+        <th>金額</th>
+        <th>注文日</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      <tr class="table-secondary">
+        <td>#{{ order.code or order.id }}</td>
+        <td>{{ order.customer_last_name or '' }} {{ order.customer_first_name or '' }}</td>
+        <td>¥{{ "{:,}".format(order.total_price|int) if order.total_price else '-' }}</td>
+        <td>{{ order.created_at or '' }}</td>
+        <td>
+          <form action="/orders/test-orders/{{ order.id }}/process" method="post" class="d-inline"
+                onsubmit="return confirm('テスト受注 #{{ order.code or order.id }} を処理しますか？')">
+            <input type="hidden" name="subscription_id" value="{{ order.subscription_id or '' }}">
+            <button class="btn btn-sm btn-secondary">
+              <i class="bi bi-trash me-1"></i>キャンセル・削除
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>テスト受注はありません。</div>
+{% endif %}
+{% endblock %}
