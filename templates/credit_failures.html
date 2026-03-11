@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% set active = "credit_failures" %}                                                                                      
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-credit-card me-2"></i>与信落ち（{{ orders|length }}件）</h4>                             
+
+{% if orders %}
+<div class="table-responsive">
+  <table class="table table-hover bg-white shadow-sm rounded">
+    <thead class="table-light">
+      <tr>
+        <th>注文番号</th>
+        <th>顧客名</th>
+        <th>メール</th>
+        <th>金額</th>
+        <th>注文日</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      <tr>
+        <td>#{{ order.code or order.id }}</td>
+        <td>{{ order.customer_last_name or '' }} {{ order.customer_first_name or '' }}</td>
+        <td>{{ order.email or '' }}</td>
+        <td>¥{{ "{:,}".format(order.total_price|int) if order.total_price else '-' }}</td>
+        <td>{{ order.created_at or '' }}</td>
+        <td>
+          <form action="/orders/credit-failures/{{ order.id }}/reauth" method="post" class="d-inline">
+            <button class="btn btn-sm btn-warning">
+              <i class="bi bi-arrow-repeat me-1"></i>再オーソリ
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>与信落ちの注文はありません。</div>
+{% endif %}
+{% endblock %}
